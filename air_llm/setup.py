@@ -18,10 +18,10 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="airllm",
-    version="2.11.0",
+    version="2.12.0",
     author="Gavin Li",
     author_email="gavinli@animaai.cloud",
-    description="AirLLM allows single 4GB GPU card to run 70B large language models without quantization, distillation or pruning. 8GB vmem to run 405B Llama3.1.",
+    description="AirLLM allows single 4GB GPU card to run 70B+ LLMs and Vision Language Models (VLMs) without quantization, distillation or pruning.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/lyogavin/airllm",
@@ -35,8 +35,17 @@ setuptools.setup(
         'optimum',
         'huggingface-hub',
         'scipy',
+        'pillow',  # Required for VLM image processing
         #'bitsandbytes' set it to optional to support fallback when not installable
     ],
+    extras_require={
+        'vlm': [
+            'pillow',
+        ],
+        'compression': [
+            'bitsandbytes',
+        ],
+    },
     cmdclass={
         'install': PostInstallCommand,
     },
@@ -45,4 +54,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    keywords="llm vlm vision language model inference optimization memory efficient multimodal",
 )
