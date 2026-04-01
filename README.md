@@ -1,6 +1,7 @@
 ![airllm_logo](https://github.com/lyogavin/airllm/blob/main/assets/airllm_logo_sm.png?v=3&raw=true)
 
 [**Quickstart**](#quickstart) | 
+[**Vision Language Models**](#vision-language-models) |
 [**Configurations**](#configurations) | 
 [**MacOS**](#macos) | 
 [**Example notebooks**](#example-python-notebook) | 
@@ -8,10 +9,13 @@
 
 **AirLLM** optimizes inference memory usage, allowing 70B large language models to run inference on a single 4GB GPU card without quantization, distillation and pruning. And you can run **405B Llama3.1** on **8GB vram** now.
 
+**🆕 NEW: Vision Language Model (VLM) Support!** - Now supports multimodal models including GLM-4V, Qwen2.5-VL, Moondream, and MedGemma.
+
 
 ## Table of Contents
 
 * [Quick start](#quickstart)
+* [Vision Language Models](#vision-language-models)
 * [Model Compression](#model-compression---3x-inference-speed-up)
 * [Configurations](#configurations)
 * [Run on MacOS](#macos)
@@ -74,6 +78,159 @@ print(output)
 Note: During inference, the original model will first be decomposed and saved layer-wise. Please ensure there is sufficient disk space in the huggingface cache directory.
  
 
+## Vision Language Models
+
+AirLLM now supports Vision Language Models (VLMs) for multimodal inference! This allows you to run large vision-language models on memory-constrained GPUs.
+
+### Supported VLM Models
+
+| Model | HuggingFace Repository | Description |
+|-------|------------------------|-------------|
+| **GLM-4.6V-Flash** | [zai-org/GLM-4.6V-Flash](https://huggingface.co/zai-org/GLM-4.6V-Flash) | Fast GLM-4 vision model |
+| **Qwen2.5-VL** | [Qwen/Qwen2.5-VL-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-32B-Instruct) | Powerful Qwen vision model |
+| **Moondream3** | [moondream/moondream3-preview](https://huggingface.co/moondream/moondream3-preview) | Efficient compact VLM |
+| **MedGemma** | [google/medgemma-4b-it](https://huggingface.co/google/medgemma-4b-it) | Medical imaging model |
+
+### VLM Quick Start
+
+```python
+from airllm import AutoModel
+from PIL import Image
+
+# Load a Vision Language Model
+model = AutoModel.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
+
+# Load and process an image
+image = Image.open("example.jpg")
+
+# Prepare inputs using the processor
+inputs = model.processor(
+    text="Describe this image in detail.",
+    images=image,
+    return_tensors="pt"
+)
+
+# Generate response
+generation_output = model.generate(
+    input_ids=inputs['input_ids'].cuda(),
+    pixel_values=inputs['pixel_values'].cuda(),
+    max_new_tokens=256,
+    use_cache=False,
+    return_dict_in_generate=True
+)
+
+output = model.tokenizer.decode(generation_output.sequences[0])
+print(output)
+```
+
+### VLM Examples
+
+<details>
+<summary>GLM-4V Example</summary>
+
+```python
+from airllm import AutoModel
+from PIL import Image
+
+model = AutoModel.from_pretrained("zai-org/GLM-4.6V-Flash")
+
+image = Image.open("photo.jpg")
+
+# GLM-4V uses a specific chat format
+messages = "<|user|>\n<image>\nWhat do you see in this image?\n<|assistant|>\n"
+
+inputs = model.processor(
+    text=messages,
+    images=image,
+    return_tensors="pt"
+)
+
+outputs = model.generate(
+    **{k: v.cuda() for k, v in inputs.items()},
+    max_new_tokens=200
+)
+
+print(model.tokenizer.decode(outputs[0]))
+```
+</details>
+
+<details>
+<summary>Moondream Example</summary>
+
+```python
+from airllm import AutoModel
+from PIL import Image
+
+model = AutoModel.from_pretrained("moondream/moondream3-preview")
+
+image = Image.open("scene.jpg")
+
+inputs = model.processor(
+    images=image,
+    text="<image>\n\nDescribe what's happening in this image.",
+    return_tensors="pt"
+)
+
+outputs = model.generate(
+    **{k: v.cuda() for k, v in inputs.items()},
+    max_new_tokens=256
+)
+
+print(model.tokenizer.decode(outputs[0]))
+```
+</details>
+
+<details>
+<summary>MedGemma Medical Imaging Example</summary>
+
+```python
+from airllm import AutoModel
+from PIL import Image
+
+# Note: MedGemma requires HuggingFace token and usage agreement
+model = AutoModel.from_pretrained(
+    "google/medgemma-4b-it",
+    hf_token="YOUR_HF_TOKEN"
+)
+
+# Load medical image (e.g., X-ray)
+image = Image.open("chest_xray.jpg")
+
+inputs = model.processor(
+    images=image,
+    text="<image>Analyze this chest X-ray. Describe any notable findings.",
+    return_tensors="pt"
+)
+
+outputs = model.generate(
+    **{k: v.cuda() for k, v in inputs.items()},
+    max_new_tokens=512
+)
+
+print(model.tokenizer.decode(outputs[0]))
+
+# Important: MedGemma is for research purposes only
+# Always consult healthcare professionals for medical decisions
+```
+</details>
+
+### VLM Configuration Options
+
+VLM models support all standard AirLLM configurations plus additional options:
+
+* **processor**: Automatically loaded for handling multimodal inputs
+* **pixel_values**: Image tensor input for vision encoder
+* **image_sizes**: Optional image dimension information
+
+```python
+model = AutoModel.from_pretrained(
+    "Qwen/Qwen2.5-VL-7B-Instruct",
+    compression='4bit',  # Enable compression for faster inference
+    device="cuda:0",
+    max_seq_len=2048,
+)
+```
+
 ## Model Compression - 3x Inference Speed Up!
 
 We just added model compression based on block-wise quantization-based model compression. Which can further **speed up the inference speed** for up to **3x** , with **almost ignorable accuracy loss!** (see more performance evaluation and why we use block-wise quantization in [this paper](https://arxiv.org/abs/2212.09720))
@@ -118,6 +275,30 @@ Just install airllm and run the code the same as on linux. See more in [Quick St
 * only [Apple silicon](https://support.apple.com/en-us/HT211814) is supported
 
 Example [python notebook] (https://github.com/lyogavin/airllm/blob/main/air_llm/examples/run_on_macos.ipynb)
+
+
+## Supported Models
+
+### Text-Only Language Models
+
+| Architecture | Example Models |
+|-------------|----------------|
+| **Llama/Llama2/Llama3** | meta-llama/Llama-2-7b-hf, meta-llama/Llama-3.1-405B |
+| **Qwen/Qwen2** | Qwen/Qwen-7B, Qwen/Qwen2-72B |
+| **ChatGLM** | THUDM/chatglm3-6b-base |
+| **Baichuan** | baichuan-inc/Baichuan2-7B-Base |
+| **InternLM** | internlm/internlm-chat-7b |
+| **Mistral** | mistralai/Mistral-7B-Instruct-v0.1 |
+| **Mixtral** | mistralai/Mixtral-8x7B-v0.1 |
+
+### Vision Language Models (VLMs)
+
+| Model | Repository | Description |
+|-------|------------|-------------|
+| **GLM-4V** | [zai-org/GLM-4.6V-Flash](https://huggingface.co/zai-org/GLM-4.6V-Flash) | Fast multimodal GLM |
+| **Qwen2.5-VL** | [Qwen/Qwen2.5-VL-32B-Instruct](https://huggingface.co/Qwen/Qwen2.5-VL-32B-Instruct) | Advanced Qwen vision model |
+| **Moondream** | [moondream/moondream3-preview](https://huggingface.co/moondream/moondream3-preview) | Efficient compact VLM |
+| **MedGemma** | [google/medgemma-4b-it](https://huggingface.co/google/medgemma-4b-it) | Medical imaging AI |
 
 
 ## Example Python Notebook
