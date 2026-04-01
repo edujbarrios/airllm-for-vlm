@@ -39,9 +39,6 @@ setuptools.setup(
         #'bitsandbytes' set it to optional to support fallback when not installable
     ],
     extras_require={
-        'vlm': [
-            'pillow',
-        ],
         'compression': [
             'bitsandbytes',
         ],

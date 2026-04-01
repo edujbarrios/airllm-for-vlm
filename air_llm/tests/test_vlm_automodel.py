@@ -5,12 +5,7 @@ These tests verify the VLM architecture detection and class mapping logic
 without requiring network access to HuggingFace Hub.
 """
 
-import sys
 import unittest
-from unittest.mock import patch, MagicMock
-
-# Ensure we can import without network access
-sys.path.insert(0, '../airllm')
 
 
 class TestVLMAutoModel(unittest.TestCase):

@@ -6,6 +6,7 @@ Supports models like:
 - THUDM/glm-4v-9b
 """
 
+import torch
 from transformers import GenerationConfig
 from .airllm_vlm_base import AirLLMVLMBase
 
@@ -119,7 +120,3 @@ class AirLLMGLMVLM(AirLLMVLMBase):
             # Prepend image features to text embeddings
             return torch.cat([image_features, text_embeds], dim=1)
         return text_embeds
-
-
-# Import torch for _merge_image_text_embeddings
-import torch

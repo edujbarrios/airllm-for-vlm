@@ -598,8 +598,8 @@ class AirLLMVLMBase(GenerationMixin):
             for x in self.layers:
                 kv_cache_list.append(([], []))
         
-        all_hidden_states = [] * len(self.layers) if output_hidden_states else None
-        all_self_attns = [] * len(self.layers) if output_attentions else None
+        all_hidden_states = [[] for _ in range(len(self.layers))] if output_hidden_states else None
+        all_self_attns = [[] for _ in range(len(self.layers))] if output_attentions else None
         
         # Store image features for later use
         image_features = None
