@@ -82,28 +82,14 @@ AirLLM supports Apple Silicon Macs:
 pip install airllm mlx torch
 ```
 
-## Acknowledgements
-
-Based on SimJeg's work from the Kaggle LLM Science Exam competition:
-- [GitHub @SimJeg](https://github.com/SimJeg)
-- [Kaggle Code](https://www.kaggle.com/code/simjeg/platypus2-70b-with-wikipedia-rag)
-
 ## Citation
 
 ```bibtex
-@software{airllm2023,
-  author = {Gavin Li},
-  title = {AirLLM: scaling large language models on low-end commodity computers},
-  url = {https://github.com/lyogavin/airllm/},
+@software{airllm-vlm2024,
+  author = {Eduardo J. Barrios},
+  title = {AirLLM for VLM: Vision Language Models inference on memory-constrained GPUs},
+  url = {https://github.com/edujbarrios/airllm-for-vlm/},
   version = {2.12.0},
-  year = {2023},
+  year = {2024},
 }
 ```
-
-## Contributing
-
-Contributions, ideas and discussions are welcome!
-
-If you find it useful, please ⭐ the repo!
-
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://bmc.link/lyogavinQ)

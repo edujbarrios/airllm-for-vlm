@@ -1,8 +1,8 @@
 """
-AutoModel factory for AirLLM models.
+AutoModel factory for AirLLM Vision Language Models.
 
-Automatically detects model architecture and returns the appropriate
-AirLLM implementation class for both text-only and vision-language models.
+Automatically detects VLM model architecture and returns the appropriate
+AirLLM VLM implementation class.
 """
 
 import importlib
@@ -46,31 +46,16 @@ VLM_ARCHITECTURE_PATTERNS = [
     ("MultiModal", None),
 ]
 
-# Text-only model architecture patterns (existing)
-TEXT_ARCHITECTURE_PATTERNS = [
-    ("Qwen2ForCausalLM", "AirLLMQWen2"),
-    ("QWen", "AirLLMQWen"),
-    ("Baichuan", "AirLLMBaichuan"),
-    ("ChatGLM", "AirLLMChatGLM"),
-    ("InternLM", "AirLLMInternLM"),
-    ("Mistral", "AirLLMMistral"),
-    ("Mixtral", "AirLLMMixtral"),
-    ("Llama", "AirLLMLlama2"),
-]
-
 
 class AutoModel:
     """
-    Factory class for automatically selecting the appropriate AirLLM model class.
+    Factory class for automatically selecting the appropriate AirLLM VLM model class.
     
-    Supports both text-only LLMs and Vision Language Models (VLMs).
+    Supports Vision Language Models (VLMs) only.
     
     Example usage:
     ```python
     from airllm import AutoModel
-    
-    # Text-only model
-    model = AutoModel.from_pretrained("meta-llama/Llama-2-7b-hf")
     
     # Vision Language Model  
     model = AutoModel.from_pretrained("Qwen/Qwen2.5-VL-7B-Instruct")
@@ -162,7 +147,7 @@ class AutoModel:
         
         architecture = config.architectures[0] if config.architectures else ""
         
-        # First, check for VLM architectures
+        # Check for VLM architectures
         if cls._is_vlm_architecture(architecture, pretrained_model_name_or_path):
             for pattern, class_name in VLM_ARCHITECTURE_PATTERNS:
                 if class_name and pattern in architecture:
@@ -192,44 +177,35 @@ class AutoModel:
             print(f"Detected generic VLM architecture: {architecture}")
             return "airllm", "AirLLMVLMBase"
         
-        # Text-only model detection (existing logic)
-        if "Qwen2ForCausalLM" in architecture:
-            return "airllm", "AirLLMQWen2"
-        elif "QWen" in architecture:
-            return "airllm", "AirLLMQWen"
-        elif "Baichuan" in architecture:
-            return "airllm", "AirLLMBaichuan"
-        elif "ChatGLM" in architecture:
-            return "airllm", "AirLLMChatGLM"
-        elif "InternLM" in architecture:
-            return "airllm", "AirLLMInternLM"
-        elif "Mistral" in architecture:
-            return "airllm", "AirLLMMistral"
-        elif "Mixtral" in architecture:
-            return "airllm", "AirLLMMixtral"
-        elif "Llama" in architecture:
-            return "airllm", "AirLLMLlama2"
-        else:
-            print(f"Unknown architecture: {architecture}, attempting to use Llama2...")
-            return "airllm", "AirLLMLlama2"
+        # Non-VLM models are not supported in this VLM-only version
+        raise ValueError(
+            f"Model architecture '{architecture}' is not a supported Vision Language Model (VLM). "
+            f"This version of AirLLM only supports VLMs. "
+            f"Supported VLM patterns: GLM-4V, Qwen2.5-VL, Moondream, MedGemma/PaliGemma."
+        )
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path, *inputs, **kwargs):
         """
-        Load a pretrained AirLLM model.
+        Load a pretrained AirLLM Vision Language Model.
         
-        Automatically detects the model architecture and returns the
+        Automatically detects the VLM architecture and returns the
         appropriate AirLLM implementation.
         
         Parameters
         ----------
         pretrained_model_name_or_path : str
-            Model path or HuggingFace repo ID
+            Model path or HuggingFace repo ID for a VLM
         
         Returns
         -------
-        AirLLMBaseModel or AirLLMVLMBase
-            The loaded model instance
+        AirLLMVLMBase
+            The loaded VLM model instance
+        
+        Raises
+        ------
+        ValueError
+            If the model is not a supported Vision Language Model
         """
         if is_on_mac_os:
             return AirLLMLlamaMlx(pretrained_model_name_or_path, *inputs, **kwargs)
