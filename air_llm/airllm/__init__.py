@@ -1,10 +1,8 @@
 """
-AirLLM - Optimized LLM inference for memory-constrained environments.
+AirLLM - Optimized Vision Language Model (VLM) inference for memory-constrained environments.
 
-Supports running 70B+ parameter models on 4GB GPUs by using layer-by-layer
-inference with strategic GPU memory management.
-
-Now includes Vision Language Model (VLM) support for multimodal inference.
+Supports running large VLMs on memory-constrained GPUs (as low as 4GB VRAM) by using 
+layer-by-layer inference with strategic GPU memory management.
 """
 
 from sys import platform
@@ -18,15 +16,7 @@ if is_on_mac_os:
     from .airllm_llama_mlx import AirLLMLlamaMlx
     from .auto_model import AutoModel
 else:
-    # Text-only LLM implementations
-    from .airllm import AirLLMLlama2
-    from .airllm_chatglm import AirLLMChatGLM
-    from .airllm_qwen import AirLLMQWen
-    from .airllm_qwen2 import AirLLMQWen2
-    from .airllm_baichuan import AirLLMBaichuan
-    from .airllm_internlm import AirLLMInternLM
-    from .airllm_mistral import AirLLMMistral
-    from .airllm_mixtral import AirLLMMixtral
+    # Base classes
     from .airllm_base import AirLLMBaseModel
     
     # Vision Language Model (VLM) implementations
