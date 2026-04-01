@@ -26,6 +26,24 @@ For model compression support (optional):
 pip install airllm bitsandbytes
 ```
 
+### Development Mode Install
+
+For contributors or developers who want to make changes to the VLM version:
+
+```bash
+# Clone the repository
+git clone https://github.com/edujbarrios/airllm-for-vlm.git
+cd airllm-for-vlm/air_llm
+
+# Install in development/editable mode
+pip install -e .
+
+# Or with compression support
+pip install -e ".[compression]"
+```
+
+This installs the package in editable mode, allowing you to modify the source code and have changes reflected immediately without reinstalling.
+
 ---
 
 ## Quick Start
