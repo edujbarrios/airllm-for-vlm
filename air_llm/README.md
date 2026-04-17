@@ -4,9 +4,12 @@
 
 **AirLLM** optimizes inference memory usage, enabling you to run large Vision Language Models (VLMs) on memory-constrained GPUs (as low as 4GB VRAM).
 
+> This repository is a fork focused on making AirLLM durable for VLM workloads: stable multimodal support, practical model coverage, and reliable low-VRAM execution.
+
 ## Installation
 
 ```bash
+# PyPI package name remains `airllm`
 pip install airllm
 ```
 
@@ -17,7 +20,7 @@ pip install airllm bitsandbytes
 
 ### Development Mode Install
 
-For contributors or developers who want to make changes to the VLM version:
+For contributors or users who want this fork’s latest VLM-focused improvements:
 
 ```bash
 # Clone the repository
