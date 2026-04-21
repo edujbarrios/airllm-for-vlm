@@ -2,7 +2,7 @@
 
 # AirLLM - Vision Language Models
 
-**AirLLM** optimizes inference memory usage, enabling you to run large Vision Language Models (VLMs) on memory-constrained GPUs (as low as 4GB VRAM).
+> This fork optimizes **AirLLM* inference memory usage, enabling you to run large Vision Language Models (VLMs) on memory-constrained GPUs (as low as 4GB VRAM).
 
 > This repository is a fork focused on making AirLLM durable for VLM workloads: stable multimodal support, practical model coverage, and reliable low-VRAM execution.
 
