@@ -1,8 +1,16 @@
 ![airllm_logo](https://github.com/lyogavin/airllm/blob/main/assets/airllm_logo_sm.png?v=3&raw=true)
 
-# AirLLM - Vision Language Models
+# AirLLM for VLM
 
-This fork optimizes **AirLLM** inference memory usage, enabling you to run large Vision Language Models (VLMs) on memory-constrained GPUs (as low as 4GB VRAM). Making AirLLM durable for VLM workloads: stable multimodal support, practical model coverage, and reliable low-VRAM execution.
+> **A fork of [AirLLM](https://github.com/lyogavin/airllm) redesigned from the ground up for native Vision Language Model (VLM) inference.**
+
+The original AirLLM is a great library for running large language models on consumer GPUs by loading model layers one at a time. However, it was built around text-only transformers and did not natively support multimodal architectures.
+
+**This fork adds first-class, native VLM support.** It is not a thin wrapper — it introduces a dedicated `AirLLMVLMBase` class and model-specific implementations (GLM-4V, Qwen2.5-VL, Moondream, MedGemma/PaliGemma) that correctly handle the unique layer structure of vision-language models: vision encoders, image-text projection layers, pixel value tensors, and multimodal generation pipelines. Non-VLM models are intentionally unsupported; this fork is exclusively focused on making VLM inference smooth.
+
+The `AutoModel` factory automatically detects the VLM architecture from the model config and loads the right implementation — you just call `AutoModel.from_pretrained()` and pass an image.
+
+**In short:** run 7B+ VLMs on as little as 4 GB VRAM, with a clean API designed specifically for multimodal workloads.
 
 ## Table of Contents
 
